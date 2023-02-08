@@ -7,7 +7,7 @@ const {
   getAllAlbums,
   getAlbumById,
   deleteAlbumById,
-} = require("../controllers/AlbumController");
+} = require("../controllers/Album/AlbumController");
 
 /** ALBUM */
 router.route("/album").post(addAlbum).get(getAllAlbums);

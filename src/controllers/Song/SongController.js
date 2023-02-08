@@ -1,9 +1,10 @@
-const BigPromise = require("../middlewares/bigPromise");
-const InvariantError = require("../exception/InvariantError");
+const BigPromise = require("../../middlewares/bigPromise");
+const InvariantError = require("../../exception/InvariantError");
 const { Pool } = require("pg");
 const { nanoid } = require("nanoid");
-const songValidatorPayload = require("../domain/song/SongValidator");
-const NotFoundError = require("../exception/NotFoundError");
+const songValidatorPayload = require("../../domain/song/SongValidator");
+const NotFoundError = require("../../exception/NotFoundError");
+const SongQuery = require("../../utils/SongQuery");
 
 const _pool = new Pool();
 
@@ -38,8 +39,7 @@ exports.addSong = BigPromise(async (req, res, next) => {
 
 /** GET All Song */
 exports.getAllSong = BigPromise(async (req, res, next) => {
-  const result = await _pool.query("SELECT * FROM songs");
-  const songs = result.rows;
+  const songs = await new SongQuery(req.query)._filter();
 
   res.status(200).json({
     status: "success",

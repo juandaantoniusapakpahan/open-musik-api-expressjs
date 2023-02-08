@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { testRoute, addUser } = require("../controllers/UserController");
+const { testRoute, addUser } = require("../controllers/User/UserController");
 
 const { isLoggin, customRoles } = require("../middlewares/user");
 

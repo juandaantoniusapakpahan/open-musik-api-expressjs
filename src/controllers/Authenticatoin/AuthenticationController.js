@@ -1,10 +1,10 @@
-const BigPromise = require("../middlewares/bigPromise");
-const NotFoundError = require("../exception/NotFoundError");
-const AuthenticationError = require("../exception/AuthenticationError");
+const BigPromise = require("../../middlewares/bigPromise");
+const NotFoundError = require("../../exception/NotFoundError");
+const AuthenticationError = require("../../exception/AuthenticationError");
 const { Pool } = require("pg");
-const logginSchema = require("../domain/user/UserLogin");
+const logginSchema = require("../../domain/user/UserLogin");
 const bcrypt = require("bcrypt");
-const cookieToken = require("../utils/cookieToken");
+const cookieToken = require("../../utils/cookieToken");
 
 const _pool = new Pool();
 

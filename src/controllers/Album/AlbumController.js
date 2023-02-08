@@ -1,9 +1,9 @@
 const { nanoid } = require("nanoid");
-const BigPromise = require("../middlewares/bigPromise");
-const AlbumValidator = require("../domain/album/AlbumValidator");
-const ClientError = require("../exception/ClientError");
+const BigPromise = require("../../middlewares/bigPromise");
+const AlbumValidator = require("../../domain/album/AlbumValidator");
+const ClientError = require("../../exception/ClientError");
 const { Pool } = require("pg");
-const NotFoundError = require("../exception/NotFoundError");
+const NotFoundError = require("../../exception/NotFoundError");
 
 // Object
 const _pool = new Pool();
@@ -24,7 +24,7 @@ exports.addAlbum = BigPromise(async (req, res, next) => {
     const album = albumResult.rows[0];
     res.status(201).json({
       status: "success",
-      message: "Successfully added album",
+      message: "Album was created",
       data: {
         album,
       },

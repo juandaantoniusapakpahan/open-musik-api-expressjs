@@ -9,6 +9,7 @@ const User = require("./routes/user");
 const Album = require("./routes/album");
 const Authentication = require("./routes/authenticaton");
 const Song = require("./routes/songs");
+const Playlist = require("./routes/playlist");
 
 const errorHandler = require("./exception/errorHandler");
 
@@ -22,6 +23,7 @@ app.use("/api/v1", User);
 app.use("/api/v1", Album);
 app.use("/api/v1", Authentication);
 app.use("/api/v1", Song);
+app.use("/api/v1", Playlist);
 
 /** Error Handler */
 app.use(errorHandler);

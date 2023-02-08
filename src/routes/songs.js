@@ -7,7 +7,7 @@ const {
   getSongById,
   editSongById,
   deleteSongById,
-} = require("../controllers/SongController");
+} = require("../controllers/Song/SongController");
 const { isLoggin } = require("../middlewares/user");
 
 router.route("/song").post(isLoggin, addSong).get(isLoggin, getAllSong);

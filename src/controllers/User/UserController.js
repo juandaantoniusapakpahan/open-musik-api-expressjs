@@ -1,10 +1,10 @@
 const { nanoid } = require("nanoid");
-const BigPromise = require("../middlewares/bigPromise");
-const UserValidator = require("../domain/user/UserValidator");
+const BigPromise = require("../../middlewares/bigPromise");
+const UserValidator = require("../../domain/user/UserValidator");
 const { Pool } = require("pg");
-const InvariantError = require("../exception/InvariantError");
+const InvariantError = require("../../exception/InvariantError");
 const bcrypt = require("bcrypt");
-const NotFoundError = require("../exception/NotFoundError");
+const NotFoundError = require("../../exception/NotFoundError");
 
 // Object
 const _pool = new Pool();
