@@ -30,3 +30,17 @@ exports.addPlaylist = BigPromise(async (req, res, next) => {
     next(error);
   }
 });
+
+exports.getAllPlaylist = BigPromise(async (req, res, next) => {
+  const result = await _pool.query(
+    "SELECT py.id, py.name, usr.name username FROM playlists py left JOIN users usr on py.owner = usr.id "
+  );
+  const playlists = result.rows;
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      playlists,
+    },
+  });
+});
