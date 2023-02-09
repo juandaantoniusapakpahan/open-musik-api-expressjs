@@ -3,7 +3,9 @@ const { Pool } = require("pg");
 const _pool = new Pool();
 const { nanoid } = require("nanoid");
 const ValidatorPlaylist = require("../../domain/playlist/PlaylistValidator");
+const NotFoundError = require("../../exception/NotFoundError");
 
+/** POST Playlist */
 exports.addPlaylist = BigPromise(async (req, res, next) => {
   try {
     ValidatorPlaylist._varifyPayload(req.body);
@@ -31,6 +33,7 @@ exports.addPlaylist = BigPromise(async (req, res, next) => {
   }
 });
 
+/** GET */
 exports.getAllPlaylist = BigPromise(async (req, res, next) => {
   const result = await _pool.query(
     "SELECT py.id, py.name, usr.name username FROM playlists py left JOIN users usr on py.owner = usr.id "
@@ -42,5 +45,26 @@ exports.getAllPlaylist = BigPromise(async (req, res, next) => {
     data: {
       playlists,
     },
+  });
+});
+
+/** DELETE */
+exports.deletePlaylistById = BigPromise(async (req, res, next) => {
+  const { playlistId } = req.params;
+
+  const query = {
+    text: "DELETE FROM playlists WHERE id = $1 RETURNING id",
+    values: [playlistId],
+  };
+
+  const result = await _pool.query(query);
+
+  if (result.rows.length < 1) {
+    throw new NotFoundError("No playlist found");
+  }
+
+  res.status(200).json({
+    status: "success",
+    message: "Playlist was deleted",
   });
 });

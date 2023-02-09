@@ -9,13 +9,6 @@ const NotFoundError = require("../../exception/NotFoundError");
 // Object
 const _pool = new Pool();
 
-exports.testRoute = (req, res, next) => {
-  res.status(200).json({
-    success: true,
-    message: "Tahap awal berhasil",
-  });
-};
-
 exports.addUser = BigPromise(async (req, res, next) => {
   try {
     UserValidator._varifyPayload(req.body);
