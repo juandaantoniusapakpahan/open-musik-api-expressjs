@@ -4,6 +4,7 @@ const _pool = new Pool();
 const { nanoid } = require("nanoid");
 const ValidatorPlaylist = require("../../domain/playlist/PlaylistValidator");
 const NotFoundError = require("../../exception/NotFoundError");
+const verifyAccess = require("../../utils/verifyAuthorization");
 
 /** POST Playlist */
 exports.addPlaylist = BigPromise(async (req, res, next) => {
@@ -50,21 +51,28 @@ exports.getAllPlaylist = BigPromise(async (req, res, next) => {
 
 /** DELETE */
 exports.deletePlaylistById = BigPromise(async (req, res, next) => {
-  const { playlistId } = req.params;
+  try {
+    const { playlistId } = req.params;
+    const userId = req.user.id;
 
-  const query = {
-    text: "DELETE FROM playlists WHERE id = $1 RETURNING id",
-    values: [playlistId],
-  };
+    await verifyAccess._verifyOwner(userId, playlistId);
 
-  const result = await _pool.query(query);
+    const query = {
+      text: "DELETE FROM playlists WHERE id = $1 RETURNING id",
+      values: [playlistId],
+    };
 
-  if (result.rows.length < 1) {
-    throw new NotFoundError("No playlist found");
+    const result = await _pool.query(query);
+
+    if (result.rows.length < 1) {
+      throw new NotFoundError("No playlist found");
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "Playlist was deleted",
+    });
+  } catch (error) {
+    next(error);
   }
-
-  res.status(200).json({
-    status: "success",
-    message: "Playlist was deleted",
-  });
 });
