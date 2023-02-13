@@ -34,7 +34,7 @@ exports.addUser = BigPromise(async (req, res, next) => {
     const user = resultUser.rows[0];
     res.status(201).json({
       status: "success",
-      message: "Successfully added user",
+      message: "Account was created",
       data: {
         user,
       },

@@ -11,6 +11,7 @@ const Authentication = require("./routes/authenticaton");
 const Song = require("./routes/songs");
 const Playlist = require("./routes/playlist");
 const Collaborations = require("./routes/collaborations");
+const PlaylistSong = require("./routes/playlistSong");
 
 const errorHandler = require("./exception/errorHandler");
 
@@ -26,6 +27,7 @@ app.use("/api/v1", Authentication);
 app.use("/api/v1", Song);
 app.use("/api/v1", Playlist);
 app.use("/api/v1", Collaborations);
+app.use("/api/v1", PlaylistSong);
 
 /** Error Handler */
 app.use(errorHandler);
