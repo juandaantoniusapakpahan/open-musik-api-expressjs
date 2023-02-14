@@ -5,6 +5,7 @@ const verifyAuthorization = require("../../utils/verifyAuthorization");
 const playlistSongValidator = require("../../domain/playlistSong/playlistSongValidator");
 const InvariantError = require("../../exception/InvariantError");
 const NotFoundError = require("../../exception/NotFoundError");
+const PlaylistActivities = require("../../controllers/PlaylistActivities/PlaylistAcitivitiesController");
 
 const _pool = new Pool();
 
@@ -38,6 +39,13 @@ exports.addPlaylistSong = BigPromise(async (req, res, next) => {
 
     const resultQuery = await _pool.query(query);
     const playlist_song = resultQuery.rows[0];
+
+    await PlaylistActivities._addPlaylistActivities(
+      playlistId,
+      songId,
+      userId,
+      "add"
+    );
 
     res.status(201).json({
       status: "success",
@@ -106,6 +114,12 @@ exports.deletePlaylistSong = BigPromise(async (req, res, next) => {
     if (result.rows.length < 1) {
       throw new NotFoundError("No found song");
     }
+    await PlaylistActivities._addPlaylistActivities(
+      playlistId,
+      songId,
+      userId,
+      "delete"
+    );
 
     res.status(200).json({
       status: "success",
