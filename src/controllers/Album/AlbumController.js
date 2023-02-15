@@ -4,10 +4,11 @@ const AlbumValidator = require("../../domain/album/AlbumValidator");
 const ClientError = require("../../exception/ClientError");
 const { Pool } = require("pg");
 const NotFoundError = require("../../exception/NotFoundError");
-
+const CacheAlbum = require("../Redis/Album/AlbumRedis");
 // Object
 const _pool = new Pool();
 const _validator = new AlbumValidator();
+const _cacheAlbum = new CacheAlbum();
 
 /** POST Album */
 exports.addAlbum = BigPromise(async (req, res, next) => {
@@ -22,6 +23,10 @@ exports.addAlbum = BigPromise(async (req, res, next) => {
     };
     const albumResult = await _pool.query(query);
     const album = albumResult.rows[0];
+
+    /** CACHE */
+    _cacheAlbum._deleteCache("albums");
+
     res.status(201).json({
       status: "success",
       message: "Album was created",
@@ -59,6 +64,8 @@ exports.editAlbum = BigPromise(async (req, res, next) => {
     const resultUpdate = await _pool.query(queryUpdate);
     const album = resultUpdate.rows[0];
 
+    await _cacheAlbum._deleteCache("albums");
+
     res.status(200).json({
       status: "success",
       message: "Album was updated",
@@ -71,8 +78,15 @@ exports.editAlbum = BigPromise(async (req, res, next) => {
 
 /** GET ALL ALBUM */
 exports.getAllAlbums = BigPromise(async (req, res, next) => {
-  const resultAlbums = await _pool.query("SELECT * FROM albums");
-  const albums = resultAlbums.rows;
+  const checkAlbums = await _cacheAlbum._getCache("albums");
+  let albums = checkAlbums;
+
+  if (!albums) {
+    const resultAlbums = await _pool.query("SELECT * FROM albums");
+    await _cacheAlbum._setCache("albums", resultAlbums.rows);
+    albums = resultAlbums.rows;
+  }
+
   res.status(200).json({
     status: "success",
     data: {
@@ -137,6 +151,7 @@ exports.deleteAlbumById = BigPromise(async (req, res, next) => {
     if (resultAlbum.rows.length < 1) {
       throw new NotFoundError("No album found");
     }
+    _cacheAlbum._deleteCache("albums");
 
     res.status(200).json({
       status: "success",
