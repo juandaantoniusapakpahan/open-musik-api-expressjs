@@ -7,6 +7,7 @@ const bcrypt = require("bcrypt");
 const NotFoundError = require("../../exception/NotFoundError");
 const NodeMailer = require("../../utils/sendEmail");
 const jwtTokenMeneger = require("../../middlewares/jwtTokenManager");
+const crypto = require("crypto");
 
 // Object
 const _pool = new Pool();
@@ -66,7 +67,7 @@ exports.forgotPassword = BigPromise(async (req, res, next) => {
 
     const url = `${req.protocol}://${req.get(
       "host"
-    )}/password/reset/${forgotToken}`;
+    )}/api/v1/password/reset/${forgotToken}`;
     const message = `Klik this link to password reset: ${url}`;
 
     await NodeMailer({
@@ -78,6 +79,50 @@ exports.forgotPassword = BigPromise(async (req, res, next) => {
     res.status(200).json({
       status: "success",
       message: "Successful send email",
+      data: {
+        url,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+exports.passwordReset = BigPromise(async (req, res, next) => {
+  const forgotToken = req.params.forgotToken;
+  const { password, passwordConfirm } = req.body;
+  const dateNow = Date.now();
+
+  const forgotPasswordToken = crypto
+    .createHash("sha256")
+    .update(forgotToken)
+    .digest("hex");
+
+  const tokenQuery = {
+    text: "SELECT * FROM users WHERE forgotpasswordtoken = $1 AND CAST(forgotpasswordexpiry as BIGINT) > CAST($2 as BIGINT)",
+    values: [forgotPasswordToken, dateNow],
+  };
+
+  try {
+    const resultTokenQuery = await _pool.query(tokenQuery);
+
+    if (resultTokenQuery.rows.length < 1) {
+      throw new InvariantError("Token is invalid or expired!");
+    }
+    if (password !== passwordConfirm) {
+      throw new InvariantError("Password and confirm password do not match");
+    }
+    const passwordHash = await bcrypt.hash(password, 10);
+    const queryUpdatePassword = {
+      text: "UPDATE users set password = $1, forgotpasswordtoken = null, forgotpasswordexpiry = null WHERE id = $2 RETURNING id",
+      values: [passwordHash, resultTokenQuery.rows[0].id],
+    };
+
+    await _pool.query(queryUpdatePassword);
+
+    res.status(200).json({
+      status: "success",
+      message: "Password was updated",
     });
   } catch (error) {
     next(error);
