@@ -5,6 +5,8 @@ const { Pool } = require("pg");
 const InvariantError = require("../../exception/InvariantError");
 const bcrypt = require("bcrypt");
 const NotFoundError = require("../../exception/NotFoundError");
+const NodeMailer = require("../../utils/sendEmail");
+const jwtTokenMeneger = require("../../middlewares/jwtTokenManager");
 
 // Object
 const _pool = new Pool();
@@ -38,6 +40,44 @@ exports.addUser = BigPromise(async (req, res, next) => {
       data: {
         user,
       },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+exports.forgotPassword = BigPromise(async (req, res, next) => {
+  try {
+    const email = req.body.email;
+
+    const queryEmail = {
+      text: "SELECT * FROM users WHERE email = $1",
+      values: [email],
+    };
+    const resultEmail = await _pool.query(queryEmail);
+
+    if (resultEmail.rows.length < 1) {
+      throw new NotFoundError("Unregistered e-mail");
+    }
+
+    const forgotToken = await jwtTokenMeneger.generateForgotToken(
+      resultEmail.rows[0].id
+    );
+
+    const url = `${req.protocol}://${req.get(
+      "host"
+    )}/password/reset/${forgotToken}`;
+    const message = `Klik this link to password reset: ${url}`;
+
+    await NodeMailer({
+      email: email,
+      subject: "JAP || Password Reset",
+      message,
+    });
+
+    res.status(200).json({
+      status: "success",
+      message: "Successful send email",
     });
   } catch (error) {
     next(error);
