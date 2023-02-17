@@ -12,6 +12,7 @@ const Song = require("./routes/songs");
 const Playlist = require("./routes/playlist");
 const Collaborations = require("./routes/collaborations");
 const PlaylistSong = require("./routes/playlistSong");
+const LikeDislikeSong = require("./routes/songlikedislike");
 
 const errorHandler = require("./exception/errorHandler");
 
@@ -28,6 +29,7 @@ app.use("/api/v1", Song);
 app.use("/api/v1", Playlist);
 app.use("/api/v1", Collaborations);
 app.use("/api/v1", PlaylistSong);
+app.use("/api/v1", LikeDislikeSong);
 
 /** Error Handler */
 app.use(errorHandler);

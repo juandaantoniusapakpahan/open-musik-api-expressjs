@@ -41,8 +41,12 @@ exports.likeSong = BigPromise(async (req, res, next) => {
 
     if (resultCheckLike.rows.length > 0) {
       queryLike = "DELETE FROM song_ld WHERE song_id = $1 AND user_id = $2";
-
       arryLike.push(songId, userId);
+      if (resultCheckLike.rows[0].status === "dislike") {
+        queryLike =
+          "UPDATE song_ld SET status = $3 WHERE song_id = $1 AND user_id = $2";
+        arryLike.push("like");
+      }
     }
     const query = {
       text: queryLike,
@@ -50,7 +54,7 @@ exports.likeSong = BigPromise(async (req, res, next) => {
     };
     await _pool.query(query);
 
-    res.statu(200).json({
+    res.status(200).json({
       status: "success",
     });
 
