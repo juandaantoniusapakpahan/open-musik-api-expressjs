@@ -4,6 +4,7 @@ const express = require("express");
 const morgan = require("morgan");
 const cookeiParser = require("cookie-parser");
 const app = express();
+const fileUpload = require("express-fileupload");
 
 const User = require("./routes/user");
 const Album = require("./routes/album");
@@ -20,6 +21,12 @@ app.use(express.json());
 app.use(morgan("tiny"));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookeiParser());
+app.use(
+  fileUpload({
+    useTempFiles: true,
+    tempFileDir: "/tmp/",
+  })
+);
 
 /** Router */
 app.use("/api/v1", User);

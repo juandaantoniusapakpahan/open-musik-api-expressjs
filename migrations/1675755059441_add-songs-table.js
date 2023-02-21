@@ -29,6 +29,12 @@ exports.up = (pgm) => {
     added_at: {
       type: "TEXT",
     },
+    image_id: {
+      type: "TEXT",
+    },
+    secure_url: {
+      type: "TEXT",
+    },
   });
 
   pgm.addConstraint(
